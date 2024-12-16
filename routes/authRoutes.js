@@ -10,9 +10,9 @@ router.post('/verify-phone-otp', verifyPhoneOtp);
 router.post('/signin-social', signinWithSocial);
 
 
-router.post('/password/reset/request', generateEmailOtpForgetPswd); // Generate OTP for password reset
-router.post('/password/reset/verify', forgetPswdVerifyEmailOtp);    // Verify OTP for password reset
-router.post('/password/reset/update', updatePassword);             // Update password
+router.patch('/password/reset/request', generateEmailOtpForgetPswd); // Generate OTP for password reset
+router.patch('/password/reset/verify', forgetPswdVerifyEmailOtp);    // Verify OTP for password reset
+router.patch('/password/reset/update', updatePassword);             // Update password
 
 
 
