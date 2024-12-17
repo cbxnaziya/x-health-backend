@@ -1,5 +1,5 @@
 const nodemailer = require('nodemailer');
-const crypto = require('crypto');  // To generate OTPs
+
 
 // Utility to send OTP to the provided email address
 const sendOtpEmail = async (email, otp) => {
@@ -22,6 +22,9 @@ const sendOtpEmail = async (email, otp) => {
   try {
     // Send OTP via email
     await transporter.sendMail(mailOptions);
+      // Return success if email is sent
+      return { success: true, message: 'OTP sent successfully' };
+
   
   } catch (error) {
     console.error('Error sending OTP:', error);
@@ -29,4 +32,4 @@ const sendOtpEmail = async (email, otp) => {
   }
 };
 
-
+module.exports = {sendOtpEmail}

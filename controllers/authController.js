@@ -115,8 +115,6 @@ const signup = async (req, res) => {
 };
 
 
-
-// Signin with email and password
 const signinWithEmail = async (req, res) => {
   const { email, password, preferred_language, device_token, device_id } = req.body;
 
@@ -128,10 +126,9 @@ const signinWithEmail = async (req, res) => {
   }
 
   try {
-    // Check if the user exists
-    const user = await User.findOne( { email   });
-
-    
+    // Check if the user exists by email
+    const user = await User.findOne( { email } );
+console.log("user:",user);
 
     if (!user) {
       return res
@@ -148,22 +145,36 @@ const signinWithEmail = async (req, res) => {
         .json({ success: false, message: "Invalid password." });
     }
 
+    // Generate OTP
+    const otp = generateOtp(); // Utility function to generate a random OTP
+
+    // Send OTP to user's registered email
+    const otpSent = await sendOtpEmail(user.email, otp);
+    
+
+    if (!otpSent) {
+      return res
+        .status(500)
+        .json({ success: false, message: "Failed to send OTP. Please try again." });
+    }
+
     // Return success and user data (excluding password)
     return res.status(200).json({
       success: true,
-      message: "Login successful.",
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        preferred_language: preferred_language || user.preferred_language, // Include provided preferred language or use stored
-        device_token, // Include device token
-        device_id, // Include device ID
-      },
+      message: "OTP sent to email.",
+      // user: {
+      //   id: user.id,
+      //   name: user.name,
+      //   email: user.email,
+      //   phone: user.phone,
+      //   preferred_language: preferred_language || user.preferred_language, // Include provided preferred language or use stored
+      //   device_token, // Include device token
+      //   device_id, // Include device ID
+      // },
+      // otp: otp, // Optionally return OTP for testing or further validation (remove in production)
     });
   } catch (error) {
-
+    console.error(error);
     return res.status(500).json({ success: false, message: "Server error." });
   }
 };
