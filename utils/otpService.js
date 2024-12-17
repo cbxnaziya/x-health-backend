@@ -36,7 +36,7 @@ const sendOtpPhone = async (phone, otp) => {
   console.log(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKEN,process.env.TWILIO_PHONE_NUMBER);
   
  
-const SMSID ="MG7ff56e764e04fdab7de9b1896d68bfdd"
+
 
   const client = twilio(process.env.TWILIO_SID, process.env.TWILIO_AUTH_TOKEN); // Initialize Twilio client
   // Ensure the phone number is in E.164 format (e.g., +1234567890)
