@@ -12,6 +12,7 @@ const userSchema = new mongoose.Schema({
   device_id: { type: String },
   signin_type: { type: String, enum: ["email", "phone", "social"], default: "email" },
   social_id: { type: String }, // store social media user id if using social login
+  token: { type: String },
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);
