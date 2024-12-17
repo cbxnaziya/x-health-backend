@@ -4,7 +4,7 @@ const {  sendOtpEmail } = require("../utils/otpService");
 const { generateOtp } = require("../utils/function");
 const User = require("../models/User");
 
-// Signup handler
+
 const signup = async (req, res) => {
   const {
     name,
@@ -44,25 +44,24 @@ const signup = async (req, res) => {
   }
 
   try {
-  // Check if the user already exists by email
-    const existingEmail = await User.findOne({ where: { email } });
-console.log("existingEmail::",existingEmail);
 
-    if (existingEmail) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Email already in use." });
+
+   const existingEmail = await User.findOne( { email });
+
+
+   if (existingEmail?.email === email) {
+     return res
+     .status(400)
+     .json({ success: false, message: "Email already in use." });
     }
+    
+    const existingPhone = await User.findOne( { phone });
 
-    // Check if the user already exists by phone
-    const existingPhone = await User.findOne({ where: { phone } });
-    console.log("existingPhone::",existingPhone);
-
-    if (existingPhone) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Phone number already in use." });
-    }
+ if (existingPhone?.phone === phone) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Phone number already in use." });
+      }
 
     // Hash the password
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -91,10 +90,31 @@ console.log("existingEmail::",existingEmail);
       },
     });
   } catch (error) {
-    console.error(error);
-    return res.status(500).json({ success: false, message: "Server error.",error:error });
+    console.error("Error during user signup:", error);
+
+    // Handle unique constraint errors
+    if (error.name === "SequelizeUniqueConstraintError") {
+      const field = error.errors[0]?.path || "unknown";
+      const message =
+        field === "email"
+          ? "Email already in use."
+          : field === "phone"
+          ? "Phone number already in use."
+          : `Duplicate entry in ${field}.`;
+
+      return res.status(400).json({ success: false, message });
+    }
+
+    // Handle other server errors
+    return res.status(500).json({
+      success: false,
+      message: "Server error. Please try again later.",
+      error: error.message,
+    });
   }
 };
+
+
 
 // Signin with email and password
 const signinWithEmail = async (req, res) => {
@@ -109,7 +129,9 @@ const signinWithEmail = async (req, res) => {
 
   try {
     // Check if the user exists
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findOne( { email   });
+
+    
 
     if (!user) {
       return res
@@ -141,10 +163,11 @@ const signinWithEmail = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error(error);
+
     return res.status(500).json({ success: false, message: "Server error." });
   }
 };
+
 // Verify OTP  on forget password
 const verifyEmailOtp = async (req, res) => {
   const { email, otp } = req.body;
@@ -233,7 +256,6 @@ const signinWithPhone = async (req, res) => {
   }
 };
 
-
 // Verify phone OTP
 const verifyPhoneOtp = async (req, res) => {
   const { phone, otp } = req.body;
@@ -261,7 +283,6 @@ const verifyPhoneOtp = async (req, res) => {
     return res.status(500).json({ success: false, message: "Server error." });
   }
 };
-
 
 // Signin with social media (Google/Facebook)
 const signinWithSocial = async (req, res) => {
@@ -310,7 +331,6 @@ const signinWithSocial = async (req, res) => {
     return res.status(500).json({ success: false, message: "Server error." });
   }
 };
-
 
 // Generate OTP for email on forget password
 const generateEmailOtpForgetPswd = async (req, res) => {
