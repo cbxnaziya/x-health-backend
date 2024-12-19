@@ -268,22 +268,37 @@ const verifyEmailOtp = async (req, res) => {
 
   try {
     // Check if the OTP exists in the database
-    const otpRecord = await User.findOne({ email_otp: otp });
+    const existingUser = await User.findOne({ email_otp: otp });
 
-    if (!otpRecord) {
+    if (!existingUser || existingUser.email !== email ) {
       return res.status(400).json({ success: false, message: "Invalid OTP." });
     }
 
     // Check if OTP has expired
-    if (new Date() > otpRecord.expires_at) {
+    if (new Date() > existingUser.expires_at) {
       return res
         .status(400)
         .json({ success: false, message: "OTP has expired." });
     }
+       // Generate a JWT token
+       const token = jwt.sign(
+        { id: existingUser.id, email: existingUser.email },
+        process.env.JWT_SECRET,
+        // { expiresIn: "1h" } // Token expires in 1 hour
+      );
+      // const existingUser = await User.findOne({ email });
+      // Use the `set` method to set the values on the instance
+      existingUser.set({
+        token: token, // Update the email_otp field
+      });
+  
+      // Save the updated instance back to the database
+      await existingUser.save();
 
     return res.status(200).json({
       success: true,
       message: "OTP verified successfully.",
+      token, // Return the JWT token
     });
   } catch (error) {
     console.error(error);
@@ -366,6 +381,7 @@ const verifyPhoneOtp = async (req, res) => {
     // OTP is verified, clear OTP field
     user.phone_otp = null;
     await user.save();
+    
 
     return res
       .status(200)

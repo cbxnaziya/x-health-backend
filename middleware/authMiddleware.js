@@ -2,7 +2,11 @@ const jwt = require('jsonwebtoken');
 
 // Middleware to protect routes
 const authMiddleware = (req, res, next) => {
+  console.log("Middleware" ,req.body);
+  
   const token = req.header('Authorization')?.split(' ')[1]; // Get token from Authorization header
+  console.log("token", token ) ;
+  
   if (!token) {
     return res.status(401).json({ message: 'Access Denied. No token provided.' });
   }

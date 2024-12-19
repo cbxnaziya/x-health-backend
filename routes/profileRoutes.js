@@ -1,10 +1,12 @@
 
 
   const express = require('express');
-const { profileSave } = require('../controllers/profileController');
+const { profileSave, updateProfile } = require('../controllers/profileController');
 const router = express.Router();
+const authMiddleware = require('../middleware/authMiddleware');
 
-router.post('/save', profileSave);
+router.post('/save',authMiddleware, profileSave);
+router.post('/update',authMiddleware, updateProfile);
 
 
 
