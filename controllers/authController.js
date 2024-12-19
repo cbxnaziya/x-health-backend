@@ -79,13 +79,13 @@ const signup = async (req, res) => {
     return res.status(201).json({
       success: true,
       message: "User registered successfully.",
-      user: {
-        id: newUser.id,
-        name: newUser.name,
-        email: newUser.email,
-        phone: newUser.phone,
-        preferred_language: newUser.preferred_language,
-      },
+      // user: {
+      //   id: newUser.id,
+      //   name: newUser.name,
+      //   email: newUser.email,
+      //   phone: newUser.phone,
+      //   preferred_language: newUser.preferred_language,
+      // },
     });
   } catch (error) {
     console.error("Error during user signup:", error);
