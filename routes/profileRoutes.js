@@ -6,7 +6,7 @@ const router = express.Router();
 const authMiddleware = require('../middleware/authMiddleware');
 
 router.post('/save',authMiddleware, profileSave);
-router.post('/update',authMiddleware, updateProfile);
+router.put('/update',authMiddleware, updateProfile);
 
 
 

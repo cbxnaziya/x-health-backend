@@ -6,6 +6,7 @@ const User = require("../models/User");
 const jwt = require('jsonwebtoken');
 const profile = require("../models/profile");
 
+
 // done
 const profileSave = async (req, res) => {
 // Save Profile API
@@ -44,8 +45,11 @@ const profileSave = async (req, res) => {
 };
 
 const updateProfile = async (req, res) => {
+  console.log(req.id,"req.id");
+  const userId  = req.id;
+  
   try {
-    const { userId, ...fieldsToUpdate } = req.body;
+    const {  ...fieldsToUpdate } = req.body;
 
     console.log("updateProfile API called...");
 

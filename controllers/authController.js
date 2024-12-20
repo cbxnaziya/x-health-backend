@@ -306,9 +306,12 @@ const verifyEmailOtp = async (req, res) => {
   }
 };
 
+
+// done
 // Signin with phone and OTP
 const signinWithPhone = async (req, res) => {
-  const { phone, preferred_language, device_token, device_id } = req.body;
+  const { phone, preferred_language, device_token, device_id ,country_code} = req.body;
+console.log("req.body",req.body);
 
   // Validate input
   if (!phone) {
@@ -319,9 +322,9 @@ const signinWithPhone = async (req, res) => {
 
   try {
     // Check if the user exists
-    const user = await User.findOne({ phone });
+    const existingUser = await User.findOne({ phone });
 
-    if (!user) {
+    if (!existingUser) {
       return res
         .status(404)
         .json({ success: false, message: "User not found." });
@@ -330,7 +333,7 @@ const signinWithPhone = async (req, res) => {
     const otp = generateOtp();
 
     // Send OTP to user's registered email
-    const otpSent = await sendOtpPhone(phone, otp);
+    const otpSent = await sendOtpPhone(otp,phone,country_code);
 
     if (!otpSent) {
       return res.status(500).json({
@@ -339,19 +342,22 @@ const signinWithPhone = async (req, res) => {
       });
     }
 
+    // const existingUser = await User.findOne({ email });
+    // Use the `set` method to set the values on the instance
+    existingUser.set({
+      phone_otp: otp, // Update the email_otp field
+    });
+
+    // Save the updated instance back to the database
+    await existingUser.save();
+
+
+
     // Return success and user data (excluding password)
     return res.status(200).json({
       success: true,
       message: "OTP sent to Phone.",
-      // user: {
-      //   id: user.id,
-      //   name: user.name,
-      //   email: user.email,
-      //   phone: user.phone,
-      //   preferred_language: preferred_language || user.preferred_language, // Include provided preferred language or use stored
-      //   device_token, // Include device token
-      //   device_id, // Include device ID
-      // },
+  
     });
   } catch (error) {
     console.error(error);
@@ -359,6 +365,7 @@ const signinWithPhone = async (req, res) => {
   }
 };
 
+//done
 // Verify phone OTP
 const verifyPhoneOtp = async (req, res) => {
   const { phone, otp } = req.body;
@@ -379,13 +386,27 @@ const verifyPhoneOtp = async (req, res) => {
     }
 
     // OTP is verified, clear OTP field
-    user.phone_otp = null;
     await user.save();
+        // Generate a JWT token
+        const token = jwt.sign(
+          { id: user.id, email: user.email },
+          process.env.JWT_SECRET,
+          // { expiresIn: "1h" } // Token expires in 1 hour
+        );
+        // const existingUser = await User.findOne({ email });
+        // Use the `set` method to set the values on the instance
+        user.set({
+          phone_otp : null,
+          token: token, // Update the email_otp field
+        });
+    
+        // Save the updated instance back to the database
+        await user.save();
     
 
     return res
       .status(200)
-      .json({ success: true, message: "Phone OTP verified successfully." });
+      .json({ success: true, message: "Phone OTP verified successfully.",token });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ success: false, message: "Server error." });
@@ -581,6 +602,7 @@ const updatePassword = async (req, res) => {
     return res.status(500).json({ success: false, message: "Server error." });
   }
 };
+
 
 module.exports = {
   signup,
