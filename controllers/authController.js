@@ -147,7 +147,7 @@ const signinWithEmailPassword = async (req, res) => {
 
     // Generate a JWT token
     const token = jwt.sign(
-      { id: existingUser.id, email: existingUser.email },
+      { id: existingUser.id, email: existingUser.email ,role: existingUser.role  },
       process.env.JWT_SECRET,
       // { expiresIn: "1h" } // Token expires in 1 hour
     );
@@ -163,11 +163,7 @@ const signinWithEmailPassword = async (req, res) => {
       success: true,
       message: "Login successful.",
       token, // Return the JWT token
-      user: {
-        id: existingUser.id,
-        email: existingUser.email,
-        name: existingUser.name, // Include additional user details as needed
-      },
+    
     });
   } catch (error) {
     console.error("Error during sign-in:", error);
@@ -282,7 +278,7 @@ const verifyEmailOtp = async (req, res) => {
     }
        // Generate a JWT token
        const token = jwt.sign(
-        { id: existingUser.id, email: existingUser.email },
+        { id: existingUser.id, email: existingUser.email,role: existingUser.role  },
         process.env.JWT_SECRET,
         // { expiresIn: "1h" } // Token expires in 1 hour
       );
@@ -389,7 +385,7 @@ const verifyPhoneOtp = async (req, res) => {
     await user.save();
         // Generate a JWT token
         const token = jwt.sign(
-          { id: user.id, email: user.email },
+          { id: user.id, email: user.email,role: user.role  },
           process.env.JWT_SECRET,
           // { expiresIn: "1h" } // Token expires in 1 hour
         );

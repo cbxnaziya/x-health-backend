@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema({
   signin_type: { type: String, enum: ["email", "phone", "social"], default: "email" },
   social_id: { type: String }, // store social media user id if using social login
   token: { type: String },
+  role: { type: String, enum: ["admin", "user"], default: "user" },
 }, { timestamps: true });
 
 module.exports = mongoose.model('User', userSchema);
